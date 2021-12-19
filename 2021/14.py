@@ -1,4 +1,5 @@
 from collections import Counter
+from itertools import pairwise
 from aocd import data, submit
 
 template, rules_section = data.split('\n\n')
@@ -6,17 +7,12 @@ rules = {pair: letter for line in rules_section.splitlines() for pair, letter in
 
 
 def make_polymer(steps=10):
-    pairs = Counter()
-    prev_letter = ''
-    for letter in template:
-        if prev_letter:
-            pairs[prev_letter + letter] += 1
-        prev_letter = letter
+    pairs = Counter(pairwise(template))
 
     for _ in range(steps):
         new = Counter()
         for pair, count in pairs.items():
-            if ins := rules.get(pair):
+            if ins := rules.get(''.join(pair)):
                 new[pair[0] + ins] += count
                 new[ins + pair[1]] += count
         pairs = new
